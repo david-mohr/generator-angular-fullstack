@@ -116,6 +116,12 @@ let lintServerScripts = lazypipe()<% if(filters.coffee) { %>
     .pipe(plugins.jshint, `${serverPath}/.jshintrc`)
     .pipe(plugins.jshint.reporter, 'jshint-stylish');<% } %>
 
+let lintServerTestScripts = lazypipe()<% if(filters.coffee) { %>
+    .pipe(plugins.coffeelint)
+    .pipe(plugins.coffeelint.reporter);<% } else { %>
+    .pipe(plugins.jshint, `${serverPath}/.jshintrc-spec`)
+    .pipe(plugins.jshint.reporter, 'jshint-stylish');<% } %>
+
 let styles = lazypipe()
     .pipe(plugins.sourcemaps.init)<% if(filters.stylus) { %>
     .pipe(plugins.stylus, {
@@ -244,6 +250,16 @@ gulp.task('lint:scripts:client', () => {
 gulp.task('lint:scripts:server', () => {
     return gulp.src(_.union(paths.server.scripts, _.map(paths.server.test, blob => '!' + blob)))
         .pipe(lintServerScripts());
+});
+
+gulp.task('lint:scripts:test', () => {
+    return gulp.src(paths.client.test)
+        .pipe(lintClientScripts());
+});
+
+gulp.task('lint:scripts:serverTest', () => {
+    return gulp.src(paths.server.test)
+        .pipe(lintServerTestScripts());
 });
 
 gulp.task('clean:tmp', () => del(['.tmp/**/*']));
