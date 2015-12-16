@@ -317,7 +317,7 @@ gulp.task('start:server', () => {
 });
 
 gulp.task('watch', () => {
-    var testFiles = _.union(paths.client.test, paths.server.test);
+    var testFiles = _.union(paths.client.test, paths.server.test.unit, paths.server.test.integration);
 
     plugins.livereload.listen();
 
@@ -335,7 +335,7 @@ gulp.task('watch', () => {
 
     plugins.watch(paths.client.scripts) //['inject:js']
         .pipe(plugins.plumber())<% if(filters.babel || filters.coffee) { %>
-        .pipe(transpile())
+        .pipe(transpileClient())
         .pipe(gulp.dest('.tmp'))<% } %>
         .pipe(plugins.livereload());
 
