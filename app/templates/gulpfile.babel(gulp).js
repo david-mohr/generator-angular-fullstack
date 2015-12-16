@@ -12,7 +12,8 @@ import lazypipe from 'lazypipe';
 import {stream as wiredep} from 'wiredep';
 import nodemon from 'nodemon';
 import {Server as KarmaServer} from 'karma';
-import runSequence from 'run-sequence';<% if(filters.stylus) { %>
+import runSequence from 'run-sequence';
+import {protractor, webdriver_update} from 'gulp-protractor';<% if(filters.stylus) { %>
 import nib from 'nib';<% } %>
 
 var plugins = gulpLoadPlugins();
@@ -35,6 +36,7 @@ const paths = {
         views: `${clientPath}/{app,components}/**/*.<%= templateExt %>`,
         mainView: `${clientPath}/index.html`,
         test: [`${clientPath}/{app,components}/**/*.{spec,mock}.<%= scriptExt %>`],
+        e2e: ['e2e/**/*.spec.js'],
         bower: `${clientPath}/bower_components/`
     },
     server: {
@@ -500,4 +502,18 @@ gulp.task('copy:server', () => {
         '.bowerrc'
     ], {cwdbase: true})
         .pipe(gulp.dest(paths.dist));
+});
+
+// Downloads the selenium webdriver
+gulp.task('webdriver_update', webdriver_update);
+
+gulp.task('test:e2e', ['env:all', 'env:test', 'start:server', 'webdriver_update'], cb => {
+    gulp.src(paths.client.e2e)
+        .pipe(protractor({
+            configFile: 'protractor.conf.js',
+        })).on('error', err => {
+            console.log(err)
+        }).on('end', () => {
+            process.exit();
+        });
 });
