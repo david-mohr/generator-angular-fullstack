@@ -153,6 +153,19 @@ let mocha = lazypipe()
         ]
     });
 
+let istanbul = lazypipe()
+    .pipe(plugins.babelIstanbul.writeReports)
+    .pipe(plugins.babelIstanbul.enforceThresholds, {
+        thresholds: {
+            global: {
+                lines: 80,
+                statements: 80,
+                branches: 80,
+                functions: 80
+            }
+        }
+    });
+
 /********************
  * Env
  ********************/
@@ -532,6 +545,37 @@ gulp.task('copy:server', () => {
         '.bowerrc'
     ], {cwdbase: true})
         .pipe(gulp.dest(paths.dist));
+});
+
+gulp.task('coverage:pre', () => {
+  return gulp.src(paths.server.scripts)
+    // Covering files
+    .pipe(plugins.babelIstanbul())
+    // Force `require` to return covered files
+    .pipe(plugins.babelIstanbul.hookRequire());
+});
+
+gulp.task('coverage:unit', () => {
+    return gulp.src(paths.server.test.unit)
+        .pipe(mocha())
+        .pipe(istanbul())
+        // Creating the reports after tests ran
+});
+
+gulp.task('coverage:integration', () => {
+    return gulp.src(paths.server.test.integration)
+        .pipe(mocha())
+        .pipe(istanbul())
+        // Creating the reports after tests ran
+});
+
+gulp.task('mocha:coverage', cb => {
+  runSequence('coverage:pre',
+              'env:all',
+              'env:test',
+              'coverage:unit',
+              'coverage:integration',
+              cb);
 });
 
 // Downloads the selenium webdriver
