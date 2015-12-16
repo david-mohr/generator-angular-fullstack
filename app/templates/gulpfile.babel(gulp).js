@@ -363,12 +363,18 @@ gulp.task('test:server', cb => {
         'env:all',
         'env:test',
         'mocha:unit',
+        'mocha:integration',
         //'mocha:coverage',
         cb);
 });
 
 gulp.task('mocha:unit', () => {
     return gulp.src(paths.server.test.unit)
+        .pipe(mocha());
+});
+
+gulp.task('mocha:integration', () => {
+    return gulp.src(paths.server.test.integration)
         .pipe(mocha());
 });
 
