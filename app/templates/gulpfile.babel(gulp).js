@@ -11,6 +11,7 @@ import open from 'open';
 import lazypipe from 'lazypipe';
 import {stream as wiredep} from 'wiredep';
 import nodemon from 'nodemon';
+import {Server as KarmaServer} from 'karma';
 import runSequence from 'run-sequence';<% if(filters.stylus) { %>
 import nib from 'nib';<% } %>
 
@@ -24,7 +25,7 @@ const paths = {
         assets: `${clientPath}/assets/**/*`,
         images: `${clientPath}/assets/images/**/*`,
         scripts: [
-            `${clientPath}/**/*.<%= scriptExt %>`,
+            `${clientPath}/**/!(*.spec|*.mock).<%= scriptExt %>`,
             `!${clientPath}/bower_components/**/*.js`
         ],<% if (filters.sass) { %>
         styles: [`${clientPath}/{app,components}/**/*.{scss,sass}`],
@@ -33,16 +34,7 @@ const paths = {
         mainStyle: `${clientPath}/app/app.<%= styleExt %>`,<% } %>
         views: `${clientPath}/{app,components}/**/*.<%= templateExt %>`,
         mainView: `${clientPath}/index.html`,
-        test: [`${clientPath}/{app,components}/**/*.spec.<%= scriptExt %>`],
-        testRequire: [
-            `${clientPath}/bower_components/angular/angular.js`,
-            `${clientPath}/bower_components/angular-mocks/angular-mocks.js`,
-            `${clientPath}/bower_components/angular-resource/angular-resource.js`,
-            `${clientPath}/bower_components/angular-cookies/angular-cookies.js`,
-            `${clientPath}/bower_components/angular-sanitize/angular-sanitize.js`,
-            `${clientPath}/bower_components/angular-route/angular-route.js`,
-            `${clientPath}/**/*.spec.<%= scriptExt %>`
-        ],
+        test: [`${clientPath}/{app,components}/**/*.{spec,mock}.<%= scriptExt %>`],
         bower: `${clientPath}/bower_components/`
     },
     server: {
@@ -354,13 +346,11 @@ gulp.task('mocha:unit', () => {
         });
 });
 
-gulp.task('test:client', () => {
-    let testFiles = _.union(paths.client.testRequire, paths.client.test);
-    return gulp.src(testFiles)
-        .pipe(plugins.karma({
-            configFile: paths.karma,
-            action: 'watch'
-        }));
+gulp.task('test:client', (done) => {
+    new KarmaServer({
+      configFile: `${__dirname}/${paths.karma}`,
+      singleRun: true
+    }, done).start();
 });
 
 // inject bower components
