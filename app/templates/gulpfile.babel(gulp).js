@@ -28,9 +28,11 @@ const paths = {
         scripts: [
             `${clientPath}/**/*.<%= scriptExt %>`,
             `!${clientPath}/bower_components/**/*.js`
-        ],
+        ],<% if (filters.sass) { %>
+        styles: [`${clientPath}/{app,components}/**/*.{scss,sass}`],
+        mainStyle: `${clientPath}/app/app.scss`,<% } else { %>
         styles: [`${clientPath}/{app,components}/**/*.<%= styleExt %>`],
-        mainStyle: `${clientPath}/app/app.<%= styleExt %>`,
+        mainStyle: `${clientPath}/app/app.<%= styleExt %>`,<% } %>
         views: `${clientPath}/{app,components}/**/*.<%= templateExt %>`,
         mainView: `${clientPath}/index.html`,
         test: [`${clientPath}/{app,components}/**/*.{spec,mock}.<%= scriptExt %>`],
