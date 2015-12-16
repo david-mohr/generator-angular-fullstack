@@ -262,6 +262,12 @@ gulp.task('lint:scripts:serverTest', () => {
         .pipe(lintServerTestScripts());
 });
 
+gulp.task('jscs', () => {
+  return gulp.src(_.union(paths.client.scripts, paths.server.scripts))
+      .pipe(plugins.jscs())
+      .pipe(plugins.jscs.reporter());
+});
+
 gulp.task('clean:tmp', () => del(['.tmp/**/*']));
 
 gulp.task('start:client', cb => {
