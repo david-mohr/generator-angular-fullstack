@@ -129,7 +129,15 @@ let styles = lazypipe()
     .pipe(plugins.autoprefixer, {browsers: ['last 1 version']})
     .pipe(plugins.sourcemaps.write, '.');<% if(filters.babel || filters.coffee) { %>
 
-let transpile = lazypipe()
+let transpileServer = lazypipe()
+    .pipe(plugins.sourcemaps.init)<% if(filters.babel) { %>
+    .pipe(plugins.babel, {
+        optional: ['runtime']
+    })<% } else { %>
+    .pipe(plugins.coffee, {bare: true})<% } %>
+    .pipe(plugins.sourcemaps.write, '.');<% } %>
+
+let transpileClient = lazypipe()
     .pipe(plugins.sourcemaps.init)<% if(filters.babel) { %>
     .pipe(plugins.babel, {
         optional: ['es7.classProperties']
@@ -226,13 +234,13 @@ gulp.task('styles', () => {
 
 gulp.task('transpile:client', () => {
     return gulp.src(paths.client.scripts)
-        .pipe(transpile())
+        .pipe(transpileClient())
         .pipe(gulp.dest('.tmp'));
 });<% } %>
 
 gulp.task('transpile:server', () => {
     return gulp.src(_.union(paths.server.scripts, paths.server.json))
-        .pipe(transpile())
+        .pipe(transpileServer())
         .pipe(gulp.dest(`${paths.dist}/${serverPath}`));
 });
 
