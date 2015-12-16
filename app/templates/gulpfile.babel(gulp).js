@@ -91,6 +91,14 @@ function whenServerReady(cb) {
         100);
 }
 
+function sortModulesFirst(a, b) {
+  var module = /\.module\.js$/;
+  var aMod = module.test(a.path);
+  var bMod = module.test(b.path);
+  // inject *.module.js first
+  return (aMod === bMod) ? 0 : (aMod ? -1 : 1);
+}
+
 /********************
  * Reusable pipelines
  ********************/
@@ -164,7 +172,8 @@ gulp.task('inject:js', () => {
     return gulp.src(paths.client.mainView)
         .pipe(plugins.inject(
             gulp.src(_.union(paths.client.scripts, ['!client/**/*.spec.<%= scriptExt %>']), {read: false})
-                .pipe(plugins.sort()),
+                .pipe(plugins.sort())
+                .pipe(plugins.sort(sortModulesFirst)),
             {
                 starttag: '<!-- injector:js -->',
                 endtag: '<!-- endinjector -->',
