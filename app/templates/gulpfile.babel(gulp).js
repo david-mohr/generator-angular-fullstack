@@ -289,6 +289,13 @@ gulp.task('start:client', cb => {
     });
 });
 
+gulp.task('start:server:prod', () => {
+    process.env.NODE_ENV = process.env.NODE_ENV || 'production';
+    config = require(`./${paths.dist}/${serverPath}/config/environment`);
+    nodemon(`-w ${paths.dist}/${serverPath} ${paths.dist}/${serverPath}`)
+        .on('log', onServerLog);
+});
+
 gulp.task('start:server', () => {
     process.env.NODE_ENV = process.env.NODE_ENV || 'development';
     config = require(`./${serverPath}/config/environment`);
@@ -335,6 +342,15 @@ gulp.task('serve', cb => {
         'styles',<% } %>
         ['start:server', 'start:client'],
         'watch',
+        cb);
+});
+
+gulp.task('serve:dist', cb => {
+    runSequence(
+        'build',
+        'env:all',
+        'env:prod',
+        ['start:server:prod', 'start:client'],
         cb);
 });
 
