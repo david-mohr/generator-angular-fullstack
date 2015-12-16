@@ -40,13 +40,12 @@ const paths = {
         bower: `${clientPath}/bower_components/`
     },
     server: {
-        scripts: [`${serverPath}/**/*.<%= scriptExt %>`],
+        scripts: [`${serverPath}/**/!(*.spec|*.integration).<%= scriptExt %>`],
         json: [`${serverPath}/**/*.json`],
-        test: [
-            `${serverPath}/**/*.spec.js`,
-            `${serverPath}/**/*.mock.js`,
-            `${serverPath}/**/*.integration.js`
-        ]
+        test: {
+          integration: `${serverPath}/**/*.integration.js`,
+          unit: `${serverPath}/**/*.spec.js`
+        }
     },
     karma: 'karma.conf.js',
     dist: 'dist'
@@ -144,6 +143,15 @@ let transpileClient = lazypipe()
     })<% } else { %>
     .pipe(plugins.coffee, {bare: true})<% } %>
     .pipe(plugins.sourcemaps.write, '.');<% } %>
+
+let mocha = lazypipe()
+    .pipe(plugins.mocha, {
+        reporter: 'spec',
+        timeout: 5000,
+        require: [
+            './mocha.conf'
+        ]
+    });
 
 /********************
  * Env
@@ -344,16 +352,8 @@ gulp.task('test:server', cb => {
 });
 
 gulp.task('mocha:unit', () => {
-    return gulp.src(paths.server.test)
-        .pipe(plugins.mocha({
-            reporter: 'spec',
-            require: [
-                './mocha.conf'
-            ]
-        }))
-        .once('end', function() {
-            process.exit();
-        });
+    return gulp.src(paths.server.test.unit)
+        .pipe(mocha());
 });
 
 gulp.task('test:client', (done) => {
