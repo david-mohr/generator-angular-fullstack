@@ -134,7 +134,7 @@ let transpileServer = lazypipe()
         optional: ['runtime']
     })<% } else { %>
     .pipe(plugins.coffee, {bare: true})<% } %>
-    .pipe(plugins.sourcemaps.write, '.');<% } %>
+    .pipe(plugins.sourcemaps.write, '.');
 
 let transpileClient = lazypipe()
     .pipe(plugins.sourcemaps.init)<% if(filters.babel) { %>
