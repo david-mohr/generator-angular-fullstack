@@ -26,7 +26,7 @@ const paths = {
         assets: `${clientPath}/assets/**/*`,
         images: `${clientPath}/assets/images/**/*`,
         scripts: [
-            `${clientPath}/**/*.<%= scriptExt %>`,
+            `${clientPath}/**/!(*.spec|*.mock).<%= scriptExt %>`,
             `!${clientPath}/bower_components/**/*.js`
         ],<% if (filters.sass) { %>
         styles: [`${clientPath}/{app,components}/**/*.{scss,sass}`],
