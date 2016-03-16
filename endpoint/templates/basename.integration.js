@@ -1,7 +1,7 @@
 'use strict';
 
 var app = require('<%= relativeRequire('server') %>');
-import request from 'supertest';<% if(filters.models) { %>
+var request = require('supertest');<% if(filters.models) { %>
 
 var new<%= classedName %>;<% } %>
 

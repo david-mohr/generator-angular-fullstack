@@ -9,9 +9,9 @@
 
 'use strict';<% if (filters.models) { %>
 
-import _ from 'lodash';<% if (filters.mongooseModels) { %>
-import <%= classedName %> from './<%= basename %>.model';<% } if (filters.sequelizeModels) { %>
-import {<%= classedName %>} from '<%= relativeRequire(config.get('registerModelsFile')) %>';<% } %>
+var _ = require('lodash');<% if (filters.mongooseModels) { %>
+var <%= classedName %> = require('./<%= basename %>.model');<% } if (filters.sequelizeModels) { %>
+var <%= classedName %> = require('<%= relativeRequire(config.get('registerModelsFile')) %>');<% } %>
 
 function respondWithResult(res, statusCode) {
   statusCode = statusCode || 200;
@@ -64,7 +64,7 @@ function handleError(res, statusCode) {
 }<% } %>
 
 // Gets a list of <%= classedName %>s
-export function index(req, res) {<% if (!filters.models) { %>
+module.exports.index = function(req, res) {<% if (!filters.models) { %>
   res.json([]);<% } else { %>
   <% if (filters.mongooseModels) { %><%= classedName %>.findAsync()<% }
      if (filters.sequelizeModels) { %><%= classedName %>.findAll()<% } %>
@@ -73,7 +73,7 @@ export function index(req, res) {<% if (!filters.models) { %>
 }<% if (filters.models) { %>
 
 // Gets a single <%= classedName %> from the DB
-export function show(req, res) {
+module.exports.show = function(req, res) {
   <% if (filters.mongooseModels) { %><%= classedName %>.findByIdAsync(req.params.id)<% }
      if (filters.sequelizeModels) { %><%= classedName %>.find({
     where: {
@@ -86,7 +86,7 @@ export function show(req, res) {
 }
 
 // Creates a new <%= classedName %> in the DB
-export function create(req, res) {
+module.exports.create = function(req, res) {
   <% if (filters.mongooseModels) { %><%= classedName %>.createAsync(req.body)<% }
      if (filters.sequelizeModels) { %><%= classedName %>.create(req.body)<% } %>
     .then(respondWithResult(res, 201))
@@ -94,7 +94,7 @@ export function create(req, res) {
 }
 
 // Updates an existing <%= classedName %> in the DB
-export function update(req, res) {
+module.exports.update = function(req, res) {
   if (req.body._id) {
     delete req.body._id;
   }
@@ -111,7 +111,7 @@ export function update(req, res) {
 }
 
 // Deletes a <%= classedName %> from the DB
-export function destroy(req, res) {
+module.exports.destroy = function(req, res) {
   <% if (filters.mongooseModels) { %><%= classedName %>.findByIdAsync(req.params.id)<% }
      if (filters.sequelizeModels) { %><%= classedName %>.find({
     where: {

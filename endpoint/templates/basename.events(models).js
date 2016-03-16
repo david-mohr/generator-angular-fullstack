@@ -4,7 +4,7 @@
 
 'use strict';
 
-import {EventEmitter} from 'events';<% if (filters.mongooseModels) { %>
+var EventEmitter = require('events').EventEmitter;<% if (filters.mongooseModels) { %>
 var <%= classedName %> = require('./<%= basename %>.model');<% } if (filters.sequelizeModels) { %>
 var <%= classedName %> = require('<%= relativeRequire(config.get('registerModelsFile')) %>').<%= classedName %>;<% } %>
 var <%= classedName %>Events = new EventEmitter();
@@ -38,4 +38,4 @@ function emitEvent(event) {
   }
 }
 
-export default <%= classedName %>Events;
+module.exports = <%= classedName %>Events;
